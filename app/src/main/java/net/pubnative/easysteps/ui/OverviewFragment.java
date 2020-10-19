@@ -26,12 +26,20 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
+
 import net.pubnative.easysteps.BuildConfig;
 import net.pubnative.easysteps.Database;
 import net.pubnative.easysteps.R;
 import net.pubnative.easysteps.SensorListener;
 import net.pubnative.easysteps.util.Logger;
 import net.pubnative.easysteps.util.Util;
+import net.pubnative.lite.sdk.api.BannerRequestManager;
+import net.pubnative.lite.sdk.api.RequestManager;
+import net.pubnative.lite.sdk.models.Ad;
+import net.pubnative.lite.sdk.utils.HeaderBiddingUtils;
 import net.pubnative.lite.sdk.views.HyBidBannerAdView;
 
 import org.eazegraph.lib.charts.BarChart;
@@ -44,6 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class OverviewFragment extends Fragment implements SensorEventListener, HyBidBannerAdView.Listener {
     private static final String TAG = OverviewFragment.class.getSimpleName();
@@ -53,7 +62,7 @@ public class OverviewFragment extends Fragment implements SensorEventListener, H
     private PieModel sliceGoal, sliceCurrent;
     private PieChart pg;
 
-    private HyBidBannerAdView mBannerView;
+    private PublisherAdView mDFPBanner;
 
     private int todayOffset, total_start, goal, since_boot, total_days;
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
@@ -95,7 +104,44 @@ public class OverviewFragment extends Fragment implements SensorEventListener, H
         pg.setUsePieRotation(true);
         pg.startAnimation();
 
-        mBannerView = v.findViewById(R.id.hybid_banner);
+        mDFPBanner = v.findViewById(R.id.dfp_banner);
+
+        mDFPBanner.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+
+            }
+
+            @Override
+            public void onAdImpression() {
+
+            }
+
+            @Override
+            public void onAdClicked() {
+
+            }
+
+            @Override
+            public void onAdOpened() {
+
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+
+            }
+
+            @Override
+            public void onAdClosed() {
+
+            }
+        });
 
         return v;
     }
@@ -158,7 +204,7 @@ public class OverviewFragment extends Fragment implements SensorEventListener, H
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mBannerView.destroy();
+        mDFPBanner.destroy();
     }
 
     /**
@@ -380,21 +426,67 @@ public class OverviewFragment extends Fragment implements SensorEventListener, H
         }
     }
 
+
+    //    mDFPBanner.load(getString(R.string.pnlite_banner_zone_id), this);
+
+
     public void loadAd() {
-        mBannerView.load(getString(R.string.pnlite_banner_zone_id), this);
+        RequestManager bannerRequestManager = new BannerRequestManager();
+        bannerRequestManager.setZoneId("1");
+        bannerRequestManager.setRequestListener(new RequestManager.RequestListener() {
+            @Override
+            public void onRequestSuccess(Ad ad) {
+                // Here you will handle the request to DFP.
+                Log.i(TAG, "onRequestSuccess "+ ad.getZoneId());
+
+                bannerRequestManager.setRequestListener(new RequestManager.RequestListener() {
+                    @Override
+                    public void onRequestSuccess(Ad ad) {
+                        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+
+                        Set<String> keywordSet = HeaderBiddingUtils.getHeaderBiddingKeywordsSet(ad, HeaderBiddingUtils.KeywordMode.TWO_DECIMALS);
+                        for (String key: keywordSet) {
+                            builder.addKeyword(key);
+                        }
+
+                        Bundle keywordBundle = HeaderBiddingUtils.getHeaderBiddingKeywordsBundle(ad, HeaderBiddingUtils.KeywordMode.TWO_DECIMALS);
+                        for (String key: keywordBundle.keySet()) {
+                            builder.addCustomTargeting(key, keywordBundle.getString(key));
+                        }
+
+                        PublisherAdRequest adRequest = builder.build();
+                        mDFPBanner.loadAd(adRequest);
+                    }
+
+                    @Override
+                    public void onRequestFail(Throwable throwable) {
+                        Log.e(TAG,"ad request failed "+ throwable.getMessage());
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestFail(Throwable throwable) {
+                Log.e(TAG,"ad request failed "+ throwable.getMessage());
+            }
+        });
+
+        bannerRequestManager.requestAd();
     }
+
+
 
     @Override
     public void onAdLoaded() {
         if (getActivity() != null && isResumed()) {
-            mBannerView.setVisibility(View.VISIBLE);
+            mDFPBanner.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onAdLoadFailed(Throwable throwable) {
         if (getActivity() != null && isResumed()) {
-            mBannerView.setVisibility(View.GONE);
+            mDFPBanner.setVisibility(View.GONE);
         }
         Log.e(TAG, throwable.getMessage());
     }
@@ -407,7 +499,7 @@ public class OverviewFragment extends Fragment implements SensorEventListener, H
     @Override
     public void onAdClick() {
         if (getActivity() != null && isResumed()) {
-            mBannerView.setVisibility(View.GONE);
+            mDFPBanner.setVisibility(View.GONE);
         }
         Log.d(TAG, "HyBid: onAdClick");
     }

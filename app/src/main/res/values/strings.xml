@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">EasySteps</string>
+    <string name="app_id">ca-app-pub-3254638938517092~3338563950</string>
+    <string name="pnlite_mrect_zone_id">1</string>
+    <string name="pnlite_app_token">dde3c298b47648459f8ada4a982fa92d</string>
+
 
     <string name="goal">Goal</string>
     <string name="step_size">Step size</string>
@@ -61,4 +65,24 @@
     <string name="no_sensor">Sensor not found</string>
     <string name="no_sensor_explain">This app requires a dedicated hardware step sensor - which your device does not have. This app won\'t run on your device.</string>
     <string name="permission_external_storage">No permission to access external storage</string>
+    <string name="leaderboard_highest_average">1</string>
+    <string name="achievement_boots_made_for_walking">2</string>
+    <string name="achievement_boots_made_for_walking_ii">3</string>
+    <string name="achievement_boots_made_for_walking_iii">4</string>
+    <string name="achievement_boots_made_for_walking_iv">5</string>
+    <string name="achievement_boots_made_for_walking_v">6</string>
+    <string name="achievement_stamina">7</string>
+    <string name="achievement_stamina_ii">11</string>
+    <string name="achievement_stamina_iii">12</string>
+    <string name="achievement_stamina_iv">13</string>
+    <string name="achievement_stamina_v">14</string>
+    <string name="achievement_stamina_vi">15</string>
+    <string name="achievement_marathon">16</string>
+    <string name="achievement_marathon_ii">17</string>
+    <string name="achievement_marathon_iii">18</string>
+    <string name="achievement_marathon_iv">^^</string>
+    <string name="achievement_marathon_v">19</string>
+    <string name="achievement_continual_i">20</string>
+    <string name="achievement_continual_ii">21</string>
+    <string name="achievement_continual_iii">22</string>
 </resources>

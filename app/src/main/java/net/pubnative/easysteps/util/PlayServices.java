@@ -25,8 +25,10 @@ public abstract class PlayServices {
      */
     private static void updateTotalLeaderboard(final GoogleApiClient gc, final Context c, int totalSteps) {
         // some cheat detection needed?
+       /*
         Games.Leaderboards
                 .submitScore(gc, c.getString(R.string.leaderboard_most_steps_walked), totalSteps);
+        */
     }
 
     /**
@@ -38,9 +40,11 @@ public abstract class PlayServices {
      */
     private static void updateOneDayLeaderboard(final GoogleApiClient gc, final Context c, int steps) {
         // some cheat detection needed?
+        /*
         Games.Leaderboards
                 .submitScore(gc, c.getString(R.string.leaderboard_most_steps_walked_in_one_day),
                         steps);
+         */
     }
 
     /**
